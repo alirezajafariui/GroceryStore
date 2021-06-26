@@ -3,51 +3,102 @@
 
 using namespace std ;
 
-class product
+class productkind
 {
-    private :
-        //map<string,product> kind ;
-        string name ;
-        string kind ;
-        int num ;
-        product * next ;
     public :
-        string getName ()
+
+        class product
         {
-            return this->name ;
+        public:
+            string name ;
+            int available ; // available count of this product .
+            product * next ;
+            product * prev ;
+
+            product ( string name , int available )
+            {
+                this->name = name ;
+                this->available = available ;
+            }
+        };
+
+        string kname ;
+        int pknum ; // Number of products of this kind .
+        productkind * next ;
+        productkind * prev ;
+        product * head ;
+        product * tail ;
+
+        productkind ()
+        {
+            this->head = nullptr ;
+            this->tail = nullptr ;
+            this->pknum = 0 ;
         }
-        void setName ( string name )
+        productkind ( string kname )
         {
-            this->name = name ;
+            this->kname = kname ;
+        }
+        ~productkind()
+        {
+            product * pro = this->head ;
+            
+            while ( pro != nullptr )
+            {
+                product * tmp = pro ;
+                pro = pro->next ;
+                delete [] tmp ;
+            }
+            
+            this->head = nullptr ;
+            this->tail = nullptr ;
+            this->pknum = 0 ;
         }
         
-        string getKind ()
+        void addProduct ( string name , int available )
         {
-            return this->kind ;
-        }
-        void setKind ( string kind )
-        {
-            this->kind = kind ;
+            product * pro = new product ( name , available ) ;
+            pro = this->head ;
+            this->pknum ++ ;
+
+            if ( pro == nullptr )
+            {
+                pro->next = this->head ;
+                pro->prev = this->tail ;
+                this->head = pro ;
+                this->tail = pro ;
+            }
+            else
+            {
+                product * tmp = this->head ;
+
+                if ( pro <= this->head )
+                {
+                    pro->prev = this->head->prev ;
+                    pro->next = this->head ;
+                    this->head = pro ;
+                    return ;
+                }
+                if ( pro >= this->tail )
+                {
+                    pro->prev = this->tail ;
+                    pro->next = this->tail->next ;
+                    this->tail = pro ;
+                    return ;
+                }
+                if ( pro <= tmp->next )
+                {
+                    pro->prev = tmp ;
+                    pro->next = tmp->next ;
+                    tmp->next->prev = pro ;
+                    tmp->next = pro ;
+                    return ;
+                }
+            }
         }
 
-        int getNum ()
-        {
-            return this->num ;
-        }
-        void setNum ( int num )
-        {
-            this->num = num ;
-        }
-
-        product * getNext ()
-        {
-            return this->next ;
-        }
-        void setNext ( product * next )
-        {
-            this->next = next ;
-        }
 };
+
 
 
 class store
