@@ -1,4 +1,5 @@
 #include <iostream>
+#include <QFile>
 #include <Qmap>
 #include <QString>
 
@@ -66,6 +67,22 @@ class productkind
 
         void addProduct ( string name , int available )
         {
+            if ( findproduct( name ) )
+            {
+                product * pro = this->head ;
+
+                while ( pro != nullptr )
+                {
+                    if ( pro->name == name )
+                    {
+                        pro->available += available ;
+                        break ;
+                    }
+                    pro = pro->next ;
+                }
+                return ;
+            }
+
             product * pro = new product ( name , available ) ;
             pro = this->head ;
             this->pknum ++ ;
@@ -105,18 +122,30 @@ class productkind
                 }
             }
         }
-        
+
+        bool findproduct ( string name )
+        {
+            product * pro = this->head ;
+
+            while ( pro != nullptr )
+            {
+                if ( pro->name == name )
+                    return true ;
+                pro = pro->next ;
+            }
+            return false ;
+        }
+
         void print ()
         {
             product * pro = this->head ;
-            
+
             while ( pro != nullptr )
             {
                 cout << pro->name << " " << pro->available << endl ;
                 pro = pro->next ;
             }
         }
-
 };
 
 
@@ -126,7 +155,7 @@ class Store
         productkind * head ;
         productkind * tail ;
         int Knum ; //Number of productkinds .
-    public:
+    public :
         Store()
         {
             this->head = nullptr ;
@@ -139,7 +168,7 @@ class Store
 
             while ( kind != nullptr )
             {
-                product * tmp = pro ;
+                productkind * tmp = kind ;
                 kind = kind->next ;
                 delete [] tmp ;
             }
@@ -149,12 +178,29 @@ class Store
             this->Knum = 0 ;
         }
 
-        productkind * addproductkind ( string kname )
+        void addproductkind ( string kname , string name , int available )
         {
+            if ( findproductkind( kname ) )
+            {
+                productkind * kind = this->head ;
+
+                while ( kind != nullptr )
+                {
+                    if ( kind->kname == kname )
+                    {
+                        kind->addProduct( name , available ) ;
+                        break ;
+                    }
+                    kind = kind->next ;
+                }
+                return ;
+            }
+
             productkind * kind = new productkind ( kname ) ;
+            kind->addProduct( name , available ) ;
             kind = this->head ;
             this->Knum ++ ;
-            
+
             if ( kind == nullptr )
             {
                 kind->prev = this->tail ;
@@ -165,7 +211,7 @@ class Store
             else
             {
                 productkind * tmp = this->head ;
-                
+
                 if ( kind->kname <= this->head->kname )
                 {
                     kind->prev = this->head->prev ;
@@ -190,7 +236,20 @@ class Store
                 }
             }
         }
-        
+
+        bool findproductkind ( string kname )
+        {
+            productkind * kind = this->head ;
+
+            while ( kind != nullptr )
+            {
+                if ( kind->kname == kname )
+                    return true ;
+                kind = kind->next ;
+            }
+            return false ;
+        }
+
         void print ()
         {
             productkind *  kind = this->head ;
@@ -198,7 +257,7 @@ class Store
             while ( kind != nullptr )
             {
                 cout << kind->kname << endl << "Products of this kind is(are) : " << kind->pknum << endl ;
-                productkind::print() ;
+                kind->print() ;
                 kind = kind->next ;
             }
         }
@@ -206,6 +265,9 @@ class Store
 
 int main( void )
 {
+    QFile outfile( "in.txt" );
+    ofstream outputFile( "output.dat" , ios::out ) ;
+
     cout << "Welcome to my store." << endl ;
 
     Store store ;
@@ -213,10 +275,8 @@ int main( void )
     int num ;
 
     //commands
-    {
-        string command ;
-        string add = "add" ;
-    }
+    string command ;
+    string add = "add" ;
 
     while ( true )
     {
