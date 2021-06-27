@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
+#include <QMap>
 //#include <QFile>
-//#include <Qmap>
 //#include <QString>
 
 using namespace std ;
@@ -276,7 +276,43 @@ int main( void )
 //    QFile outfile( "in.txt" );
 //    ofstream outputFile( "output.dat" , ios::out ) ;
 
-    cout << "Welcome to my store." << endl ;
+    cout << "Welcome to your store." << endl ;
+
+    QMap<string,string> ID ;
+    string username , password ;
+    while ( true )
+    {
+        cout << "sign in. please enter your user name : " ;
+        cin >> username ;
+        if ( ID.find( username ) != ID.end() )
+        {
+            cout << "hello " << username << ". please enter your password : " ;
+            cin >> password ;
+            if( ID[username] == password )
+            {
+                cout << "Welecome " << username << endl ;
+                break ;
+            }
+            else
+            {
+                cout << "The password is not true. please try another time." << endl ;
+                continue ;
+            }
+        }
+        else
+        {
+            cout << username << " not founded. please sign up. enter your username : " ;
+            cin >> username ;
+            cout << "enter your password : " ;
+            cin >> password ;
+
+            ID[username] = password ;
+
+            cout << "signed up successfuly." << endl ;
+        }
+
+    }
+
 
     Store store ;
     string kind , name ;
