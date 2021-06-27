@@ -121,6 +121,41 @@ class productkind
             }
         }
 
+        void popproduct ( string name )
+        {
+            product * pro = this->head ;
+            this->pknum -- ;
+
+            if ( name == this->head->name )
+            {
+                pro->next->prev = pro->prev ;
+                this->head = pro->next ;
+                delete [] pro ;
+                return ;
+            }
+            if ( name == this->tail->name )
+            {
+                pro = this->tail ;
+                pro->prev->next = this->tail->next ;
+                this->tail = pro->prev ;
+                delete [] pro ;
+                return ;
+            }
+
+            while ( pro != nullptr )
+            {
+                if ( name == pro->name )
+                {
+                    pro->prev->next = pro->next ;
+                    pro->next->prev = pro->prev ;
+                    delete [] pro ;
+                    return ;
+                }
+                else
+                    pro = pro->next ;
+            }
+        }
+
         bool findproduct ( string name )
         {
             product * pro = this->head ;
@@ -241,6 +276,58 @@ class Store
             }
         }
 
+        void popproductkind ( string kname , string name = "0" )
+        {
+            productkind * kind = this->head ;
+
+            if ( name == "0" )
+            {
+                this->Knum -- ;
+
+                if ( kname == this->head->kname )
+                {
+                    kind->next->prev = kind->prev ;
+                    this->head = kind->next ;
+                    delete [] kind ;
+                    return ;
+                }
+                if ( kname == this->tail->kname )
+                {
+                    kind = this->tail ;
+                    kind->prev->next = this->tail->next ;
+                    this->tail = kind->prev ;
+                    delete [] kind ;
+                    return ;
+                }
+
+                while ( kind != nullptr )
+                {
+                    if ( kname == kind->kname )
+                    {
+                        kind->prev->next = kind->next ;
+                        kind->next->prev = kind->prev ;
+                        delete [] kind ;
+                        return ;
+                    }
+                    else
+                        kind = kind->next ;
+                }
+
+            }
+            else
+            {
+                while ( kind != nullptr )
+                {
+                    if ( kname == kind->kname )
+                        break ;
+                    else
+                        kind = kind->next ;
+                }
+
+                kind->popproduct( name ) ;
+            }
+        }
+
         bool findproductkind ( string kname )
         {
             productkind * kind = this->head ;
@@ -338,6 +425,28 @@ int main( void )
             store.addproductkind( kind , name , num ) ;
 
             cout << "product saved." << endl ;
+        }
+
+        if ( command == "popkind" )
+        {
+            cout << "What kind of product do you want to delete? " ;
+            cin >> kind ;
+
+            store.popproductkind( kind ) ;
+
+            cout << "This kind of product deleted." << endl ;
+        }
+
+        if ( command == "popproduct" )
+        {
+            cout << "What kind of product do you want to add? " ;
+            cin >> kind ;
+            cout << "What is the product name? " ;
+            cin >> name ;
+
+            store.popproductkind( kind , name ) ;
+
+            cout << "This product deleted." << endl ;
         }
 
         if ( command == "print" )
