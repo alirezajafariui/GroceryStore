@@ -1,7 +1,8 @@
 #include <iostream>
-#include <QFile>
-#include <Qmap>
-#include <QString>
+#include <string>
+//#include <QFile>
+//#include <Qmap>
+//#include <QString>
 
 using namespace std ;
 
@@ -17,14 +18,10 @@ class productkind
             product * next ;
             product * prev ;
 
-            product ()
-            {
-                this->available = 0 ;
-            }
             product ( string name , int available )
             {
                 this->name = name ;
-                this->available += available ;
+                this->available = available ;
             }
             ~product ()
             {
@@ -39,15 +36,12 @@ class productkind
         product * head ;
         product * tail ;
 
-        productkind ()
-        {
-            this->head = nullptr ;
-            this->tail = nullptr ;
-            this->pknum = 0 ;
-        }
         productkind ( string kname )
         {
             this->kname = kname ;
+            this->head = nullptr ;
+            this->tail = nullptr ;
+            this->pknum = 0 ;
         }
         ~productkind()
         {
@@ -67,28 +61,11 @@ class productkind
 
         void addProduct ( string name , int available )
         {
-            if ( findproduct( name ) )
-            {
-                product * pro = this->head ;
-
-                while ( pro != nullptr )
-                {
-                    if ( pro->name == name )
-                    {
-                        pro->available += available ;
-                        break ;
-                    }
-                    pro = pro->next ;
-                }
-                return ;
-            }
-
-            product * pro = new product ( name , available ) ;
-            pro = this->head ;
             this->pknum ++ ;
 
-            if ( pro == nullptr )
+            if ( this->head == nullptr )
             {
+                product * pro = new product ( name , available ) ;
                 pro->next = this->head ;
                 pro->prev = this->tail ;
                 this->head = pro ;
@@ -96,12 +73,32 @@ class productkind
             }
             else
             {
+                if ( findproduct( name ) )
+                {
+                    this->pknum -- ;
+                    product * pro = this->head ;
+
+                    while ( pro != nullptr )
+                    {
+                        if ( pro->name == name )
+                        {
+                            pro->available += available ;
+                            break ;
+                        }
+                        pro = pro->next ;
+                    }
+                    return ;
+                }
+
+                product * pro = new product ( name , available ) ;
+
                 product * tmp = this->head ;
 
                 if ( pro->name <= this->head->name )
                 {
                     pro->prev = this->head->prev ;
                     pro->next = this->head ;
+                    this->head->prev = pro ;
                     this->head = pro ;
                     return ;
                 }
@@ -109,6 +106,7 @@ class productkind
                 {
                     pro->prev = this->tail ;
                     pro->next = this->tail->next ;
+                    this->tail->next = pro ;
                     this->tail = pro ;
                     return ;
                 }
@@ -168,6 +166,7 @@ class Store
 
             while ( kind != nullptr )
             {
+                //kind->destroy() ;
                 productkind * tmp = kind ;
                 kind = kind->next ;
                 delete [] tmp ;
@@ -180,29 +179,12 @@ class Store
 
         void addproductkind ( string kname , string name , int available )
         {
-            if ( findproductkind( kname ) )
-            {
-                productkind * kind = this->head ;
-
-                while ( kind != nullptr )
-                {
-                    if ( kind->kname == kname )
-                    {
-                        kind->addProduct( name , available ) ;
-                        break ;
-                    }
-                    kind = kind->next ;
-                }
-                return ;
-            }
-
-            productkind * kind = new productkind ( kname ) ;
-            kind->addProduct( name , available ) ;
-            kind = this->head ;
             this->Knum ++ ;
 
-            if ( kind == nullptr )
+            if ( this->head == nullptr )
             {
+                productkind * kind = new productkind ( kname ) ;
+                kind->addProduct( name , available ) ;
                 kind->prev = this->tail ;
                 kind->next = this->head ;
                 this->head = kind ;
@@ -210,12 +192,33 @@ class Store
             }
             else
             {
+                if ( findproductkind( kname ) )
+                {
+                    this->Knum -- ;
+                    productkind * kind = this->head ;
+
+                    while ( kind != nullptr )
+                    {
+                        if ( kind->kname == kname )
+                        {
+                            kind->addProduct( name , available ) ;
+                            break ;
+                        }
+                        kind = kind->next ;
+                    }
+                    return ;
+                }
+
+                productkind * kind = new productkind ( kname ) ;
+                kind->addProduct( name , available ) ;
+
                 productkind * tmp = this->head ;
 
                 if ( kind->kname <= this->head->kname )
                 {
                     kind->prev = this->head->prev ;
                     kind->next = this->head ;
+                    this->head->prev = kind ;
                     this->head = kind ;
                     return ;
                 }
@@ -223,6 +226,7 @@ class Store
                 {
                     kind->prev = this->tail ;
                     kind->next = this->tail->next ;
+                    this->tail->next = kind ;
                     this->tail = kind ;
                     return ;
                 }
@@ -252,21 +256,25 @@ class Store
 
         void print ()
         {
-            productkind *  kind = this->head ;
+            productkind * kind = this->head ;
 
+            cout << endl << this->Knum << endl ;
             while ( kind != nullptr )
             {
-                cout << kind->kname << endl << "Products of this kind is(are) : " << kind->pknum << endl ;
+                cout << kind->kname << " " << kind->pknum << endl ;
                 kind->print() ;
+                cout << endl ;
                 kind = kind->next ;
             }
         }
 };
 
+
+
 int main( void )
 {
-    QFile outfile( "in.txt" );
-    ofstream outputFile( "output.dat" , ios::out ) ;
+//    QFile outfile( "in.txt" );
+//    ofstream outputFile( "output.dat" , ios::out ) ;
 
     cout << "Welcome to my store." << endl ;
 
@@ -282,27 +290,30 @@ int main( void )
     {
         cin >> command ;
 
-        switch ( command )
+        if ( command == "add" )
         {
-            case "add" :
-            {
-                multimap<string,product> pro ;
-                cout << "What kind of product do you want to add? " ;
-                cin >> kind ;
-                cout << "What is the product name? " ;
-                cin >> name ;
-                cout << "How many of this product do you want to add? " ;
-                cin >> num ;
+            cout << "What kind of product do you want to add? " ;
+            cin >> kind ;
+            cout << "What is the product name? " ;
+            cin >> name ;
+            cout << "How many of this product do you want to add? " ;
+            cin >> num ;
 
-                pro[kind] = Store.add_new_pro( name , num ) ;
+            store.addproductkind( kind , name , num ) ;
 
-                cout << "product saved." << endl ;
-            }
-            break;
+            cout << "product saved." << endl ;
         }
 
-    }
+        if ( command == "print" )
+        {
+            store.print() ;
+        }
 
+        if ( command == "fin" )
+        {
+            break ;
+        }
+    }
 
 
     return 0 ;
