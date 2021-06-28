@@ -121,6 +121,21 @@ class productkind
             }
         }
 
+        void editproduct ( string name )
+        {
+            product * pro = this->head ;
+
+            while ( pro != nullptr )
+            {
+                if ( name == pro->name )
+                    break ;
+                else
+                    pro = pro->next ;
+            }
+
+            pro->name = name ;
+        }
+
         void popproduct ( string name )
         {
             product * pro = this->head ;
@@ -276,6 +291,28 @@ class Store
             }
         }
 
+        void editproductkind ( string kname , string name = "0" )
+        {
+            productkind * kind = this->head ;
+
+            while ( kind != nullptr )
+            {
+                if ( kname == kind->kname )
+                    break ;
+                else
+                    kind = kind->next ;
+            }
+
+            if ( name == "0" )
+            {
+                kind->kname = kname ;
+            }
+            if ( name != "0" )
+            {
+                kind->editproduct( name ) ;
+            }
+        }
+
         void popproductkind ( string kname , string name = "0" )
         {
             productkind * kind = this->head ;
@@ -410,7 +447,7 @@ int main( void )
 
 
     Store store ;
-    string kind , name ;
+    string kind , name , ans ;
     int num ;
 
     //commands
@@ -433,6 +470,41 @@ int main( void )
             store.addproductkind( kind , name , num ) ;
 
             cout << "product saved." << endl ;
+        }
+
+        if ( command == "edit" )
+        {
+            cout << "Do you want to edit the name of a product kind? Y/N : " ;
+            cin >> ans ;
+            if ( ans == "Y" )
+            {
+                cout << "What kind of product do you want to edit? : " ;
+                cin >> kind ;
+
+                store.editproductkind( kind ) ;
+
+                cout << "product kind name changed." << endl << endl ;
+            }
+            if ( ans == "N" )
+            {
+                cout << "Do you want to edit the name of a product? Y/N : " ;
+                cin >> ans ;
+                if ( ans == "Y" )
+                {
+                    cout << "What kind of product do you want to edit? : " ;
+                    cin >> kind ;
+                    cout << "What product do you want to edit? : " ;
+                    cin >> name ;
+
+                    store.editproductkind( kind , name ) ;
+
+                    cout << "product name changed." << endl << endl ;
+                }
+                if ( ans == "N" )
+                {
+                    cout << "Nothing changed." << endl << endl ;
+                }
+            }
         }
 
         if ( command == "popkind" )
@@ -466,10 +538,10 @@ int main( void )
         {
             cout << "What kind of product list do you want print? : " ;
             cin >> kind ;
-            
+
             store.print( kind ) ;
         }
-        
+
         if ( command == "fin" )
         {
             break ;
