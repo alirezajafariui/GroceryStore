@@ -341,17 +341,26 @@ class Store
             return false ;
         }
 
-        void print ()
+        void print ( string kname = "0" )
         {
             productkind * kind = this->head ;
 
-            cout << endl << this->Knum << endl ;
-            while ( kind != nullptr )
+            if ( kname != "0" )
             {
-                cout << kind->kname << " " << kind->pknum << endl ;
+                cout << endl << this->Knum << endl ;
+                while ( kind != nullptr )
+                {
+                    cout << kind->kname << " " << kind->pknum << endl ;
+                    kind->print() ;
+                    cout << endl ;
+                    kind = kind->next ;
+                }
+            }
+            else
+            {
+                cout << kname << " " << Knum << endl ;
                 kind->print() ;
                 cout << endl ;
-                kind = kind->next ;
             }
         }
 };
@@ -397,7 +406,6 @@ int main( void )
 
             cout << "signed up successfuly." << endl ;
         }
-
     }
 
 
@@ -454,6 +462,14 @@ int main( void )
             store.print() ;
         }
 
+        if ( command == "printgroup" )
+        {
+            cout << "What kind of product list do you want print? : " ;
+            cin >> kind ;
+            
+            store.print( kind ) ;
+        }
+        
         if ( command == "fin" )
         {
             break ;
