@@ -1,6 +1,6 @@
 #include <iostream>
-#include <ostream>
 #include <string>
+#include <QString>
 #include <QMap>
 #include <QFile>
 #include <QTextStream>
@@ -10,12 +10,12 @@ using namespace std ;
 class product
 {
     public:
-        string name ;
+        QString name ;
         int available ; // available count of this product .
         product * next ;
         product * prev ;
 
-        product ( string name , int available )
+        product ( QString name , int available )
         {
             this->name = name ;
             this->available = available ;
@@ -26,14 +26,14 @@ class product
 class productkind
 {
     public :
-        string kname ;
+        QString kname ;
         int pknum ; // Number of products of this kind .
         productkind * next ;
         productkind * prev ;
         product * head ;
         product * tail ;
 
-        productkind ( string kname )
+        productkind ( QString kname )
         {
             this->kname = kname ;
             this->head = nullptr ;
@@ -56,7 +56,7 @@ class productkind
             this->pknum = 0 ;
         }
 
-        void addProduct ( string name , int available )
+        void addProduct ( QString name , int available )
         {
             this->pknum ++ ;
 
@@ -118,7 +118,7 @@ class productkind
             }
         }
 
-        void editproduct ( string name , string newname )
+        void editproduct ( QString name , QString newname )
         {
             product * pro = this->head ;
 
@@ -133,7 +133,7 @@ class productkind
             pro->name = newname ;
         }
 
-        void popproduct ( string name )
+        void popproduct ( QString name )
         {
             product * pro = this->head ;
             this->pknum -- ;
@@ -168,7 +168,7 @@ class productkind
             }
         }
 
-        bool findproduct ( string name )
+        bool findproduct ( QString name )
         {
             product * pro = this->head ;
 
@@ -187,7 +187,7 @@ class productkind
 
             while ( pro != nullptr )
             {
-                cout << pro->name << " " << pro->available << endl ;
+                cout << pro->name.toStdString() << " " << pro->available << endl ;
                 pro = pro->next ;
             }
         }
@@ -196,11 +196,12 @@ class productkind
 
 class Store
 {
-    private :
+    public :
         productkind * head ;
         productkind * tail ;
         int Knum ; //Number of productkinds .
-    public :
+
+
         Store()
         {
             this->head = nullptr ;
@@ -223,7 +224,7 @@ class Store
             this->Knum = 0 ;
         }
 
-        void addproductkind ( string kname , string name , int available )
+        void addproductkind ( QString kname , QString name , int available )
         {
             this->Knum ++ ;
 
@@ -287,7 +288,7 @@ class Store
             }
         }
 
-        void editproductkind ( string kname , string newkname , string name = "0" , string newname = "0" )
+        void editproductkind ( QString kname , QString newkname , QString name = "0" , QString newname = "0" )
         {
             productkind * kind = this->head ;
 
@@ -309,7 +310,7 @@ class Store
             }
         }
 
-        void popproductkind ( string kname , string name = "0" )
+        void popproductkind ( QString kname , QString name = "0" )
         {
             productkind * kind = this->head ;
 
@@ -361,7 +362,7 @@ class Store
             }
         }
 
-        bool findproductkind ( string kname )
+        bool findproductkind ( QString kname )
         {
             productkind * kind = this->head ;
 
@@ -374,7 +375,7 @@ class Store
             return false ;
         }
 
-        void print ( string kname = "0" )
+        void print ( QString kname = "0" )
         {
             productkind * kind = this->head ;
 
@@ -383,7 +384,7 @@ class Store
                 cout << endl << this->Knum << endl ;
                 while ( kind != nullptr )
                 {
-                    cout << kind->kname << " " << kind->pknum << endl ;
+                    cout << kind->kname.toStdString() << " " << kind->pknum << endl ;
                     kind->print() ;
                     cout << endl ;
                     kind = kind->next ;
@@ -398,7 +399,7 @@ class Store
                     else
                         kind = kind->next ;
                 }
-                cout << kind->kname << " " << kind->pknum << endl ;
+                cout << kind->kname.toStdString() << " " << kind->pknum << endl ;
                 kind->print() ;
                 cout << endl ;
             }
@@ -409,24 +410,46 @@ class Store
 
 int main( void )
 {
+    Store store ;
+    QString command , kind , name , ans , newkname , newname ;
+    int num ;
+
+    QMap<QString,QString> ID ;
+    QString username , password ;
+
+
 //    QFile outfile( "in.txt" );
 //    ofstream outputFile( "output.dat" , ios::out ) ;
 
     cout << "Welcome to your store." << endl ;
 
-    QMap<string,string> ID ;
-    string username , password ;
+//    QFile file( "out.txt" ) ;
+//    file.open( QFile::Text | QFile::ReadOnly ) ;
+//    if ( !file.open( QIODevice::ReadOnly | QIODevice::Text ) )
+//           return 0 ;
+//    QTextStream in ( &file ) ;
+//    while ( !in.atEnd() )
+//    {
+//        QStringList
+//    }
+
+
+
+
+
     while ( true )
     {
         cout << "sign in. please enter your user name : " ;
-        cin >> username ;
+
+        QTextStream Qtin( stdin );
+        Qtin >> username ;
         if ( ID.find( username ) != ID.end() )
         {
-            cout << "hello " << username << ". please enter your password : " ;
-            cin >> password ;
+            cout << "hello " << username.toStdString() << ". please enter your password : " ;
+            Qtin >> password ;
             if( ID[username] == password )
             {
-                cout << "Welecome " << username << endl ;
+                cout << "Welecome " << username.toStdString() << endl ;
                 break ;
             }
             else
@@ -437,10 +460,10 @@ int main( void )
         }
         else
         {
-            cout << username << " not founded. please sign up. enter your username : " ;
-            cin >> username ;
+            cout << username.toStdString() << " not founded. please sign up. enter your username : " ;
+            Qtin >> username ;
             cout << "enter your password : " ;
-            cin >> password ;
+            Qtin >> password ;
 
             ID[username] = password ;
 
@@ -449,26 +472,20 @@ int main( void )
     }
 
 
-    Store store ;
-    string kind , name , ans , newkname , newname ;
-    int num ;
-
-    //commands
-    string command ;
-    string add = "add" ;
-
     while ( true )
     {
-        cin >> command ;
+        QTextStream Qtin( stdin );
+
+        Qtin >> command ;
 
         if ( command == "add" )
         {
             cout << "What kind of product do you want to add? " ;
-            cin >> kind ;
+            Qtin >> kind ;
             cout << "What is the product name? " ;
-            cin >> name ;
+            Qtin >> name ;
             cout << "How many of this product do you want to add? " ;
-            cin >> num ;
+            Qtin >> num ;
 
             store.addproductkind( kind , name , num ) ;
 
@@ -478,13 +495,13 @@ int main( void )
         if ( command == "edit" )
         {
             cout << "Do you want to edit the name of a product kind? Y/N : " ;
-            cin >> ans ;
+            Qtin >> ans ;
             if ( ans == "Y" )
             {
                 cout << "What kind of product do you want to edit? : " ;
-                cin >> kind ;
+                Qtin >> kind ;
                 cout << "What is the new name? : " ;
-                cin >> newkname ;
+                Qtin >> newkname ;
 
                 store.editproductkind( kind , newkname ) ;
 
@@ -493,15 +510,15 @@ int main( void )
             if ( ans == "N" )
             {
                 cout << "Do you want to edit the name of a product? Y/N : " ;
-                cin >> ans ;
+                Qtin >> ans ;
                 if ( ans == "Y" )
                 {
                     cout << "What kind of product do you want to edit? : " ;
-                    cin >> kind ;
+                    Qtin >> kind ;
                     cout << "What product do you want to edit? : " ;
-                    cin >> name ;
+                    Qtin >> name ;
                     cout << "What is the new name ? : " ;
-                    cin >> newname ;
+                    Qtin >> newname ;
 
                     store.editproductkind( kind , "0" , name , newname ) ;
 
@@ -517,7 +534,7 @@ int main( void )
         if ( command == "popkind" )
         {
             cout << "What kind of product do you want to delete? " ;
-            cin >> kind ;
+            Qtin >> kind ;
 
             store.popproductkind( kind ) ;
 
@@ -527,9 +544,9 @@ int main( void )
         if ( command == "popproduct" )
         {
             cout << "What kind of product do you want to delete? " ;
-            cin >> kind ;
+            Qtin >> kind ;
             cout << "What is the product name? " ;
-            cin >> name ;
+            Qtin >> name ;
 
             store.popproductkind( kind , name ) ;
 
@@ -544,7 +561,7 @@ int main( void )
         if ( command == "printgroup" )
         {
             cout << "What kind of product list do you want print? : " ;
-            cin >> kind ;
+            Qtin >> kind ;
 
             store.print( kind ) ;
         }
@@ -559,12 +576,28 @@ int main( void )
 
 //    QFile file( "out.txt" ) ;
 //    file.open( QFile::Text | QFile::WriteOnly ) ;
-//    if ( !file.open( QIODevice::WriteOnly | QIODevice::Text) )
+//    if ( !file.open( QIODevice::WriteOnly | QIODevice::Text ) )
 //           return 0 ;
 //    QTextStream out ( &file ) ;
-//    out << "Users number : " << ID.size() << endl ;
+//    out << store.Knum << "\n" ;
+//    for ( int i = 0 ; i < store.Knum ; ++ i )
+//    {
+//        QString name = "a" ;
+//        out << name << " " << store.head->pknum << "\n" ;
+
+//        for ( int j = 0 ; j < store.head->pknum ; ++ j )
+//        {
+//            out << store.head->head->name << " " << store.head->head->available << "\n" ;
+//            store.head->head = store.head->head->next ;
+//        }
+
+//        store.head = store.head->next ;
+//    }
+
+
+//    out << "Users number : " << ID.size() << "\n" ;
 //    for ( auto it = ID.begin() ; it != ID.end() ; ++ it )
-//        out << it.key() << " " << it.value() << endl ;
+//        out << it.key() << " " << it.value() << "\n" ;
 
 
     return 0 ;
