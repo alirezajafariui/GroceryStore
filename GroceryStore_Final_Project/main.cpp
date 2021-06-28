@@ -1,34 +1,31 @@
 #include <iostream>
+#include <ostream>
 #include <string>
 #include <QMap>
-//#include <QFile>
-//#include <QString>
-
+#include <QFile>
+#include <QTextStream>
+#include <QStringList>
 using namespace std ;
+
+class product
+{
+    public:
+        string name ;
+        int available ; // available count of this product .
+        product * next ;
+        product * prev ;
+
+        product ( string name , int available )
+        {
+            this->name = name ;
+            this->available = available ;
+        }
+};
+
 
 class productkind
 {
     public :
-
-        class product
-        {
-        public:
-            string name ;
-            int available ; // available count of this product .
-            product * next ;
-            product * prev ;
-
-            product ( string name , int available )
-            {
-                this->name = name ;
-                this->available = available ;
-            }
-            ~product ()
-            {
-                this->available = 0 ;
-            }
-        };
-
         string kname ;
         int pknum ; // Number of products of this kind .
         productkind * next ;
@@ -43,7 +40,7 @@ class productkind
             this->tail = nullptr ;
             this->pknum = 0 ;
         }
-        ~productkind()
+        ~productkind ()
         {
             product * pro = this->head ;
 
@@ -51,7 +48,7 @@ class productkind
             {
                 product * tmp = pro ;
                 pro = pro->next ;
-                delete [] tmp ;
+                delete tmp ;
             }
 
             this->head = nullptr ;
@@ -121,7 +118,7 @@ class productkind
             }
         }
 
-        void editproduct ( string name )
+        void editproduct ( string name , string newname )
         {
             product * pro = this->head ;
 
@@ -133,7 +130,7 @@ class productkind
                     pro = pro->next ;
             }
 
-            pro->name = name ;
+            pro->name = newname ;
         }
 
         void popproduct ( string name )
@@ -145,7 +142,7 @@ class productkind
             {
                 pro->next->prev = pro->prev ;
                 this->head = pro->next ;
-                delete [] pro ;
+                delete pro ;
                 return ;
             }
             if ( name == this->tail->name )
@@ -153,7 +150,7 @@ class productkind
                 pro = this->tail ;
                 pro->prev->next = this->tail->next ;
                 this->tail = pro->prev ;
-                delete [] pro ;
+                delete pro ;
                 return ;
             }
 
@@ -163,7 +160,7 @@ class productkind
                 {
                     pro->prev->next = pro->next ;
                     pro->next->prev = pro->prev ;
-                    delete [] pro ;
+                    delete pro ;
                     return ;
                 }
                 else
@@ -216,10 +213,9 @@ class Store
 
             while ( kind != nullptr )
             {
-                //kind->destroy() ;
                 productkind * tmp = kind ;
                 kind = kind->next ;
-                delete [] tmp ;
+                delete tmp ;
             }
 
             this->head = nullptr ;
@@ -291,7 +287,7 @@ class Store
             }
         }
 
-        void editproductkind ( string kname , string name = "0" )
+        void editproductkind ( string kname , string newkname , string name = "0" , string newname = "0" )
         {
             productkind * kind = this->head ;
 
@@ -305,11 +301,11 @@ class Store
 
             if ( name == "0" )
             {
-                kind->kname = kname ;
+                kind->kname = newkname ;
             }
             if ( name != "0" )
             {
-                kind->editproduct( name ) ;
+                kind->editproduct( name , newname ) ;
             }
         }
 
@@ -325,7 +321,7 @@ class Store
                 {
                     kind->next->prev = kind->prev ;
                     this->head = kind->next ;
-                    delete [] kind ;
+                    delete kind ;
                     return ;
                 }
                 if ( kname == this->tail->kname )
@@ -333,7 +329,7 @@ class Store
                     kind = this->tail ;
                     kind->prev->next = this->tail->next ;
                     this->tail = kind->prev ;
-                    delete [] kind ;
+                    delete kind ;
                     return ;
                 }
 
@@ -343,7 +339,7 @@ class Store
                     {
                         kind->prev->next = kind->next ;
                         kind->next->prev = kind->prev ;
-                        delete [] kind ;
+                        delete kind ;
                         return ;
                     }
                     else
@@ -382,7 +378,7 @@ class Store
         {
             productkind * kind = this->head ;
 
-            if ( kname != "0" )
+            if ( kname == "0" )
             {
                 cout << endl << this->Knum << endl ;
                 while ( kind != nullptr )
@@ -395,7 +391,14 @@ class Store
             }
             else
             {
-                cout << kname << " " << Knum << endl ;
+                while ( kind != nullptr )
+                {
+                    if ( kind->kname == kname )
+                        break ;
+                    else
+                        kind = kind->next ;
+                }
+                cout << kind->kname << " " << kind->pknum << endl ;
                 kind->print() ;
                 cout << endl ;
             }
@@ -447,7 +450,7 @@ int main( void )
 
 
     Store store ;
-    string kind , name , ans ;
+    string kind , name , ans , newkname , newname ;
     int num ;
 
     //commands
@@ -480,8 +483,10 @@ int main( void )
             {
                 cout << "What kind of product do you want to edit? : " ;
                 cin >> kind ;
+                cout << "What is the new name? : " ;
+                cin >> newkname ;
 
-                store.editproductkind( kind ) ;
+                store.editproductkind( kind , newkname ) ;
 
                 cout << "product kind name changed." << endl << endl ;
             }
@@ -495,8 +500,10 @@ int main( void )
                     cin >> kind ;
                     cout << "What product do you want to edit? : " ;
                     cin >> name ;
+                    cout << "What is the new name ? : " ;
+                    cin >> newname ;
 
-                    store.editproductkind( kind , name ) ;
+                    store.editproductkind( kind , "0" , name , newname ) ;
 
                     cout << "product name changed." << endl << endl ;
                 }
@@ -519,7 +526,7 @@ int main( void )
 
         if ( command == "popproduct" )
         {
-            cout << "What kind of product do you want to add? " ;
+            cout << "What kind of product do you want to delete? " ;
             cin >> kind ;
             cout << "What is the product name? " ;
             cin >> name ;
@@ -547,6 +554,17 @@ int main( void )
             break ;
         }
     }
+
+
+
+//    QFile file( "out.txt" ) ;
+//    file.open( QFile::Text | QFile::WriteOnly ) ;
+//    if ( !file.open( QIODevice::WriteOnly | QIODevice::Text) )
+//           return 0 ;
+//    QTextStream out ( &file ) ;
+//    out << "Users number : " << ID.size() << endl ;
+//    for ( auto it = ID.begin() ; it != ID.end() ; ++ it )
+//        out << it.key() << " " << it.value() << endl ;
 
 
     return 0 ;
