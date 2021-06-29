@@ -182,14 +182,41 @@ class productkind
             return false ;
         }
 
+        QStringList search ( QString word )
+        {
+            product * pro = this->head ;
+            QStringList qstl ;
+
+            while ( pro != nullptr )
+            {
+                if ( checkword( pro->name , word ) )
+                    qstl += pro->name ;
+                pro = pro->next ;
+            }
+
+            return qstl ;
+        }
+
+        bool checkword ( QString name , QString word )
+        {
+            bool flag = true ;
+            if ( word.size() > name.size() )
+                return false ;
+            for ( int i = 0 ; i < word.size() ; ++ i )
+            {
+                if ( name[i] != word[i] )
+                    flag = false ;
+            }
+            return flag ;
+        }
+
         void print ()
         {
             product * pro = this->head ;
 
             while ( pro != nullptr )
             {
-                qDebug() << pro->name ;
-                cout << " " << pro->available << "\n" ;
+                cout << pro->name.toStdString() << " " << pro->available << "\n" ;
                 pro = pro->next ;
             }
         }
@@ -377,6 +404,35 @@ class Store
             return false ;
         }
 
+        QStringList search ( QString kname , QString word )
+        {
+            productkind * kind = this->head ;
+            QStringList qstl ;
+
+            if ( kname == "0" )
+            {
+                while ( kind != nullptr )
+                {
+                    qstl += kind->search( word ) ;
+                    kind = kind->next ;
+                }
+            }
+            else
+            {
+                while ( kind != nullptr )
+                {
+                    if ( kname == kind->kname )
+                        break ;
+                    else
+                        kind = kind->next ;
+                }
+
+                qstl += kind->search( word ) ;
+            }
+
+            return qstl ;
+        }
+
         void print ( QString kname = "0" )
         {
             productkind * kind = this->head ;
@@ -386,8 +442,7 @@ class Store
                 cout << endl << this->Knum << endl ;
                 while ( kind != nullptr )
                 {
-                    qDebug() << kind->kname ;
-                    cout << " " << kind->pknum << endl ;
+                    cout << kind->kname.toStdString() << " " << kind->pknum << endl ;
                     kind->print() ;
                     cout << endl ;
                     kind = kind->next ;
@@ -402,8 +457,7 @@ class Store
                     else
                         kind = kind->next ;
                 }
-                qDebug() << kind->kname ;
-                cout << " " << kind->pknum << endl ;
+                cout << kind->kname.toStdString() << " " << kind->pknum << endl ;
                 kind->print() ;
                 cout << endl ;
             }
@@ -415,7 +469,7 @@ class Store
 int main( void )
 {
     Store store ;
-    QString qst , command , kind , name , ans , newkname , newname ;
+    QString qst , command , kind , name , ans , newkname , newname , let ;
     QStringList qstl ;
     int num ;
 
@@ -568,6 +622,35 @@ int main( void )
             store.popproductkind( kind , name ) ;
 
             cout << "This product deleted." << endl ;
+        }
+
+        if ( command == "search" )
+        {
+            cout << "Do you want to search among all the products? Y/N : " ;
+            Qtin >> ans ;
+            if ( ans == "Y" )
+            {
+                cout << "Please enter the first letters of the word. : " ;
+                Qtin >> let ;
+
+                QStringList qstl = store.search( "0" , let ) ;
+
+                for ( auto y : qstl )
+                    qDebug() << y ;
+            }
+            else
+            {
+                cout << "What kind of product do you want to search among? : " ;
+                Qtin >> kind ;
+                cout << "Please enter the first letters of the word. : " ;
+                Qtin >> let ;
+
+                QStringList qstl = store.search( kind , let ) ;
+
+                for ( auto y : qstl )
+                    qDebug() << y ;
+            }
+
         }
 
         if ( command == "print" )
