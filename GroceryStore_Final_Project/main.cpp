@@ -5,6 +5,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QStringList>
+#include <QDebug>
 using namespace std ;
 
 class product
@@ -187,7 +188,8 @@ class productkind
 
             while ( pro != nullptr )
             {
-                cout << pro->name.toStdString() << " " << pro->available << endl ;
+                qDebug() << pro->name ;
+                cout << " " << pro->available << "\n" ;
                 pro = pro->next ;
             }
         }
@@ -384,7 +386,8 @@ class Store
                 cout << endl << this->Knum << endl ;
                 while ( kind != nullptr )
                 {
-                    cout << kind->kname.toStdString() << " " << kind->pknum << endl ;
+                    qDebug() << kind->kname ;
+                    cout << " " << kind->pknum << endl ;
                     kind->print() ;
                     cout << endl ;
                     kind = kind->next ;
@@ -399,7 +402,8 @@ class Store
                     else
                         kind = kind->next ;
                 }
-                cout << kind->kname.toStdString() << " " << kind->pknum << endl ;
+                qDebug() << kind->kname ;
+                cout << " " << kind->pknum << endl ;
                 kind->print() ;
                 cout << endl ;
             }
@@ -411,32 +415,45 @@ class Store
 int main( void )
 {
     Store store ;
-    QString command , kind , name , ans , newkname , newname ;
+    QString qst , command , kind , name , ans , newkname , newname ;
+    QStringList qstl ;
     int num ;
 
     QMap<QString,QString> ID ;
     QString username , password ;
 
 
-//    QFile outfile( "in.txt" );
-//    ofstream outputFile( "output.dat" , ios::out ) ;
+    QFile file( "out.txt" );
+    file.open( QFile::Text | QFile::ReadOnly ) ;
+    QTextStream in ( &file ) ;
+
+    qst = in.readLine() ;
+    for ( int i = 0 ; i < qst[0].digitValue() ; ++ i )
+    {
+        qstl = in.readLine().split( ' ' ) ;
+        ID[qstl[0]] = qstl[1] ;
+    }
+
+    qst = in.readLine() ;
+    for ( int i = 0 ; i < qst[0].digitValue() ; ++ i )
+    {
+        //qDebug() << 1 ;
+        qstl = in.readLine().split( ' ' ) ;
+        kind = qstl[0] ;
+        int a = qstl[1][0].digitValue() ;
+        for ( int j = 0 ; j < a ; ++ j )
+        {
+            //qDebug() << 2 << qstl[1][0].digitValue() ;
+            qstl = in.readLine().split( ' ' ) ;
+            name = qstl[0] ;
+            num = qstl[1][0].digitValue() ;
+            store.addproductkind( kind , name , num ) ;
+        }
+    }
+    file.close() ;
+
 
     cout << "Welcome to your store." << endl ;
-
-//    QFile file( "out.txt" ) ;
-//    file.open( QFile::Text | QFile::ReadOnly ) ;
-//    if ( !file.open( QIODevice::ReadOnly | QIODevice::Text ) )
-//           return 0 ;
-//    QTextStream in ( &file ) ;
-//    while ( !in.atEnd() )
-//    {
-//        QStringList
-//    }
-
-
-
-
-
     while ( true )
     {
         cout << "sign in. please enter your user name : " ;
@@ -574,30 +591,34 @@ int main( void )
 
 
 
-//    QFile file( "out.txt" ) ;
-//    file.open( QFile::Text | QFile::WriteOnly ) ;
-//    if ( !file.open( QIODevice::WriteOnly | QIODevice::Text ) )
-//           return 0 ;
-//    QTextStream out ( &file ) ;
-//    out << store.Knum << "\n" ;
-//    for ( int i = 0 ; i < store.Knum ; ++ i )
-//    {
-//        QString name = "a" ;
-//        out << name << " " << store.head->pknum << "\n" ;
+    file.open( QFile::Text | QFile::WriteOnly ) ;
 
-//        for ( int j = 0 ; j < store.head->pknum ; ++ j )
-//        {
-//            out << store.head->head->name << " " << store.head->head->available << "\n" ;
-//            store.head->head = store.head->head->next ;
-//        }
+    QTextStream out ( &file ) ;
 
-//        store.head = store.head->next ;
-//    }
+    // ?? ?? ??????? ???? ???? ?? ??????
+    out << ID.size() << "\n" ;
+    for ( auto it = ID.begin() ; it != ID.end() ; ++ it )
+        out << it.key() << " " << it.value() << "\n" ;
 
+    // ???? ????? ??????? ???????
+    out << store.Knum << "\n" ;
+    for ( int i = 0 ; i < store.Knum ; ++ i )
+    {
+        if ( store.head == nullptr )
+            break ;
 
-//    out << "Users number : " << ID.size() << "\n" ;
-//    for ( auto it = ID.begin() ; it != ID.end() ; ++ it )
-//        out << it.key() << " " << it.value() << "\n" ;
+        out << store.head->kname << " " << store.head->pknum << "\n" ;
+
+        for ( int j = 0 ; j < store.head->pknum ; ++ j )
+        {
+            out << store.head->head->name << " " << store.head->head->available << "\n" ;
+            store.head->head = store.head->head->next ;
+        }
+
+        store.head = store.head->next ;
+    }
+    file.close() ;
+
 
 
     return 0 ;
