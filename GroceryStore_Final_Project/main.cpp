@@ -388,6 +388,7 @@ class Store
                 }
 
                 kind->popproduct( name ) ;
+                
             }
         }
 
@@ -431,6 +432,14 @@ class Store
             }
 
             return qstl ;
+        }
+
+        void clear ()
+        {
+            productkind * kind = this->head ;
+
+            while ( kind != nullptr )
+                this->popproductkind( kind->kname ) ;
         }
 
         void print ( QString kname = "0" )
@@ -666,6 +675,29 @@ int main( void )
             store.print( kind ) ;
         }
 
+        if ( command == "clear" )
+        {
+            cout << "Do you want to clear users? Y/N : " ;
+            Qtin >> ans ;
+
+            if ( ans == "Y" )
+            {
+                ID.clear() ;
+                cout << "List of users is empty." << endl ;
+            }
+            else
+            {
+                cout << "Do you want to clear the store list? Y/N : " ;
+                Qtin >> ans ;
+
+                if ( ans == "Y" )
+                {
+                    store.clear() ;
+                    cout << "Store list is empty." << endl ;
+                }
+            }
+        }
+
         if ( command == "fin" )
         {
             break ;
@@ -675,7 +707,6 @@ int main( void )
 
 
     file.open( QFile::Text | QFile::WriteOnly ) ;
-
     QTextStream out ( &file ) ;
 
     // ?? ?? ??????? ???? ???? ?? ??????
